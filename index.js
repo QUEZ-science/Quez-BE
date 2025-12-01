@@ -1,22 +1,17 @@
-require('dotenv').config();
-
+require('dotenv').config(); // 환경 변수 로드
 const express = require('express');
 const app = express();
 
-const clientId = '16d7ce96'; // 클라이언트 ID
-const clientSecret = '7bb3bf46bef1ee2ed58047d5e2fe7aa7'; // 클라이언트 시크릿
-const { BsmOauth } = require('bsm-oauth');
-const bsmOauth = new BsmOauth(clientId, clientSecret);
+const authRoutes = require('./routes/auth'); // 위에서 수정한 파일 연결
+const PORT = process.env.PORT || 3000;
 
-app.get('/oauth', async (req, res) => {
-  const authCode = req.query.code;
+app.use(express.json()); 
 
-  // 임시 인증코드를 유저 토큰으로 교환
-  // 유저 토큰은 유저마다 고유하기에 따로 보관하여 일정시간마다 유저의 정보를 갱신하는 용도로도 사용할 수 있습니다
-  const token = await bsmOauth.getToken(authCode);
-  const resource = await bsmOauth.getResource(token);
+// 라우트 연결
+app.use('/api/auth', authRoutes);
+// 나중에 만들 user 라우트도 있으면 여기에 추가
+// app.use('/api/user', require('./routes/user')); 
 
-  console.log(resource);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-app.listen(3000);

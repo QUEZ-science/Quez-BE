@@ -1,17 +1,22 @@
-require('dotenv').config(); // 환경 변수 로드
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors'); // 통신 허용 패키지
 const app = express();
 
-const authRoutes = require('./routes/auth'); // 위에서 수정한 파일 연결
 const PORT = process.env.PORT || 3000;
+const authRoutes = require('./routes/auth'); // 인증 라우터 연결
 
-app.use(express.json()); 
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true // 쿠키나 인증 헤더 허용
+}));
 
-// 라우트 연결
+// 2. JSON 데이터 해석
+app.use(express.json());
+
+// 3. 라우트 등록
 app.use('/api/auth', authRoutes);
-// 나중에 만들 user 라우트도 있으면 여기에 추가
-// app.use('/api/user', require('./routes/user')); 
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });

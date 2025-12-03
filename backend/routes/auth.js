@@ -8,10 +8,9 @@ const bsmOauth = new BsmOauth(
     process.env.BSM_CLIENT_SECRET
 );
 
-// POST /api/auth/oauth
-router.post('/oauth', async (req, res) => {
+router.get('/oauth', async (req, res) => {
     try {
-        const authCode = req.body.code;
+        const authCode = req.query.code; 
 
         if (!authCode) {
             return res.status(400).json({ message: "인증 코드가 없습니다." });
@@ -21,13 +20,15 @@ router.post('/oauth', async (req, res) => {
         const token = await bsmOauth.getToken(authCode);
         const resource = await bsmOauth.getResource(token);
         
-        console.log("🔥 로그인 시도한 유저:", resource.nickname);
+        // ⭐️⭐️⭐️ [수정] resource 객체 전체를 출력합니다. (24번째 줄) ⭐️⭐️⭐️
+        console.log("🔥 BSM 유저 정보 전체:", resource);
 
         // 2. DB가 없으니 그냥 바로 토큰 발급 (로그인은 성공 처리)
         const myToken = jwt.sign(
             { 
-                userCode: resource.userCode,
-                nickname: resource.nickname,
+                // resource.user.userCode 대신 resource.userCode 사용 또는 resource.code 사용 
+                userCode: resource.userCode, // (혹시나 해서 user를 뺌)
+                nickname: resource.name, // resource.user를 제거
                 role: resource.role
             },
             process.env.JWT_SECRET,
@@ -39,8 +40,8 @@ router.post('/oauth', async (req, res) => {
             message: "로그인 성공 (DB 미연결 상태)",
             token: myToken,
             user: {
-                name: resource.nickname,
-                studentId: resource.userCode
+                name: resource.name,
+                studentId: resource.userCode 
             }
         });
 

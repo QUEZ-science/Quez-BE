@@ -22,6 +22,8 @@ app.use(express.json());
 app.use('/bsm/auth', authRoutes); // BSM 인증 경로는 '/bsm/auth/oauth'
 app.use('/api/quiz', quizRoutes); // ⭐️ [추가] 보호된 퀴즈 경로
 app.use('/api/ranking', require('./routes/ranking'));
+app.use("/api/quiz", require("./routes/quiz")); // 데일리
+app.use("/api/quiz", require("./routes/quizSession")); // Normal 세션 퀴즈
 
 
 app.listen(PORT, () => {
